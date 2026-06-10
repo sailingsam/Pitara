@@ -1,0 +1,30 @@
+# Binaries
+/pitara
+/bin/
+/dist/
+
+# Go
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+vendor/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Local snapshots (dev)
+snapshot.json
+
+# Env
+.env
+.env.*
+
+# Internal design docs (kept local, not published)
+DESIGN.md

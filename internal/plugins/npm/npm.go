@@ -142,7 +142,7 @@ func parseNPMList(output string) ([]snapshot.GlobalPackage, error) {
 
 	globals := make([]snapshot.GlobalPackage, 0, len(parsed.Dependencies))
 	for name, dep := range parsed.Dependencies {
-		if skipPackages[name] {
+		if skipPackages[name] || plugins.IsSelf(name) {
 			continue
 		}
 		version := strings.TrimPrefix(dep.Version, "v")

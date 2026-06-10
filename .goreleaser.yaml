@@ -1,0 +1,43 @@
+# GoReleaser config — builds binaries for every platform and publishes a GitHub Release.
+# Run by GitHub Actions on a version tag push (see .github/workflows/release.yml).
+# Local dry run (no upload):  goreleaser release --snapshot --clean
+version: 2
+
+project_name: pitara
+
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - id: pitara
+    main: ./cmd/pitara
+    binary: pitara
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w
+
+# Publish raw binaries (not tar.gz) so the npm installer can download one file directly.
+# Produces assets named: pitara_linux_amd64, pitara_darwin_arm64, pitara_windows_amd64.exe, ...
+archives:
+  - id: raw
+    formats:
+      - binary
+    name_template: "pitara_{{ .Os }}_{{ .Arch }}"
+
+checksum:
+  name_template: "checksums.txt"
+
+release:
+  github:
+    owner: sailingsam
+    name: pitara
+  draft: false

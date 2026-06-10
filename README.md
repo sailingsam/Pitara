@@ -45,19 +45,24 @@ vars. Snapshots are safe to store and share.
 
 ## Install
 
-Requires [Go](https://go.dev/dl/) 1.23+.
+**npm** (works with npm, pnpm, and bun — all use the npm registry):
+
+```bash
+npm install -g pitara
+```
+
+**From source** (requires [Go](https://go.dev/dl/) 1.23+):
 
 ```bash
 go install github.com/sailingsam/pitara/cmd/pitara@latest
-```
 
-Or build from source:
-
-```bash
+# or
 git clone https://github.com/sailingsam/pitara.git
-cd pitara
-go build -o pitara ./cmd/pitara
+cd pitara && go build -o pitara ./cmd/pitara
 ```
+
+Prebuilt binaries for macOS, Linux, and Windows are attached to each
+[GitHub Release](https://github.com/sailingsam/pitara/releases).
 
 ---
 

@@ -1,0 +1,44 @@
+{
+  "name": "pitara",
+  "version": "0.1.0",
+  "description": "Backup and restore your developer environment — language runtimes and global CLI tools.",
+  "bin": {
+    "pitara": "run.js"
+  },
+  "scripts": {
+    "postinstall": "node install.js"
+  },
+  "files": [
+    "run.js",
+    "install.js"
+  ],
+  "keywords": [
+    "cli",
+    "backup",
+    "restore",
+    "developer-tools",
+    "environment",
+    "dotfiles"
+  ],
+  "homepage": "https://github.com/sailingsam/pitara#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sailingsam/pitara.git"
+  },
+  "bugs": {
+    "url": "https://github.com/sailingsam/pitara/issues"
+  },
+  "author": "sailingsam",
+  "engines": {
+    "node": ">=16"
+  },
+  "os": [
+    "darwin",
+    "linux",
+    "win32"
+  ],
+  "cpu": [
+    "x64",
+    "arm64"
+  ]
+}

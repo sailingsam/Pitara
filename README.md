@@ -187,5 +187,4 @@ and `go test ./...` before opening a PR.
 
 ## License
 
-Not yet licensed. An OSI-approved license (likely MIT) will be added before the
-first public release.
+[MIT](LICENSE) © sailingsam

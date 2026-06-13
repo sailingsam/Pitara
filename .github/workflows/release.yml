@@ -1,7 +1,9 @@
 name: release
 
-# Runs on GitHub's servers whenever you push a version tag (e.g. v0.1.0).
-# Builds all platform binaries with GoReleaser and creates the GitHub Release.
+# Runs on GitHub's servers whenever you push a version tag (e.g. v0.3.0).
+# 1) GoReleaser builds all platform binaries and creates the GitHub Release.
+# 2) Once that's done, the npm package is auto-published to the registry.
+# So a single `git push origin vX.Y.Z` ships everything — no manual `npm publish`.
 on:
   push:
     tags:
@@ -31,3 +33,29 @@ jobs:
           args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  npm-publish:
+    needs: goreleaser # wait for the release + binaries to exist first
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          registry-url: "https://registry.npmjs.org" # configures auth for npm publish
+
+      - name: Sync package version to the tag
+        # The tag (e.g. v0.3.0) is the single source of truth. Derive the npm
+        # version from it so package.json never has to be bumped by hand — and
+        # so install.js downloads binaries from the matching release.
+        working-directory: npm
+        run: npm version "${GITHUB_REF_NAME#v}" --no-git-tag-version --allow-same-version
+
+      - name: Publish to npm
+        working-directory: npm
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

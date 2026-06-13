@@ -1,6 +1,6 @@
 {
   "name": "pitara",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Backup and restore your developer environment — language runtimes and global CLI tools.",
   "bin": {
     "pitara": "run.js"

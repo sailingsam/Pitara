@@ -102,10 +102,30 @@ func pluginPayload(name string, fullSnap []byte) (json.RawMessage, error) {
 		return json.Marshal(struct {
 			Node *snapshot.Runtime `json:"node"`
 		}{Node: snap.Languages.Node})
+	case "go":
+		return json.Marshal(struct {
+			Go *snapshot.Runtime `json:"go"`
+		}{Go: snap.Languages.Go})
+	case "java":
+		return json.Marshal(struct {
+			Java *snapshot.Java `json:"java"`
+		}{Java: snap.Languages.Java})
+	case "bun":
+		return json.Marshal(struct {
+			Bun *snapshot.Runtime `json:"bun"`
+		}{Bun: snap.Languages.Bun})
 	case "npm-globals":
 		return json.Marshal(struct {
 			NPM *snapshot.GlobalPackages `json:"npm"`
 		}{NPM: snap.Packages.NPM})
+	case "pnpm-globals":
+		return json.Marshal(struct {
+			PNPM *snapshot.GlobalPackages `json:"pnpm"`
+		}{PNPM: snap.Packages.PNPM})
+	case "bun-globals":
+		return json.Marshal(struct {
+			Bun *snapshot.GlobalPackages `json:"bun"`
+		}{Bun: snap.Packages.Bun})
 	default:
 		return nil, fmt.Errorf("unknown plugin %q", name)
 	}
@@ -119,12 +139,42 @@ func hasRestoreData(name string, payload json.RawMessage) bool {
 		}
 		_ = json.Unmarshal(payload, &data)
 		return data.Node != nil && data.Node.Version != ""
+	case "go":
+		var data struct {
+			Go *snapshot.Runtime `json:"go"`
+		}
+		_ = json.Unmarshal(payload, &data)
+		return data.Go != nil && data.Go.Version != ""
+	case "java":
+		var data struct {
+			Java *snapshot.Java `json:"java"`
+		}
+		_ = json.Unmarshal(payload, &data)
+		return data.Java != nil && data.Java.Version != ""
+	case "bun":
+		var data struct {
+			Bun *snapshot.Runtime `json:"bun"`
+		}
+		_ = json.Unmarshal(payload, &data)
+		return data.Bun != nil && data.Bun.Version != ""
 	case "npm-globals":
 		var data struct {
 			NPM *snapshot.GlobalPackages `json:"npm"`
 		}
 		_ = json.Unmarshal(payload, &data)
 		return data.NPM != nil && len(data.NPM.Globals) > 0
+	case "pnpm-globals":
+		var data struct {
+			PNPM *snapshot.GlobalPackages `json:"pnpm"`
+		}
+		_ = json.Unmarshal(payload, &data)
+		return data.PNPM != nil && len(data.PNPM.Globals) > 0
+	case "bun-globals":
+		var data struct {
+			Bun *snapshot.GlobalPackages `json:"bun"`
+		}
+		_ = json.Unmarshal(payload, &data)
+		return data.Bun != nil && len(data.Bun.Globals) > 0
 	default:
 		return false
 	}

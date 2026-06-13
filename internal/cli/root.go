@@ -13,6 +13,11 @@ func NewRoot() *cobra.Command {
 
 	root.AddCommand(newScanCmd())
 	root.AddCommand(newRestoreCmd())
+	root.AddCommand(newLoginCmd())
+	root.AddCommand(newLogoutCmd())
+	root.AddCommand(newWhoamiCmd())
+	root.AddCommand(newBackupCmd())
+	root.AddCommand(newSnapshotsCmd())
 
 	return root
 }

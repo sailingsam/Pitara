@@ -26,5 +26,6 @@ snapshot.json
 .env
 .env.*
 
-# Internal design docs (kept local, not published)
+# Internal design docs / working notes (kept local, not published)
 DESIGN.md
+PHASE2-3-NOTES.md

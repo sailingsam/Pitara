@@ -15,17 +15,22 @@ pitara restore --from snapshot.json   # rebuild it elsewhere
 
 ## Status
 
-Pitara is in **early development**. What works today:
+Pitara works today. Local backup/restore is fully offline; cloud backup uses
+**your own GitHub** — no Pitara server, no database.
 
-- ✅ `pitara scan` — discover Node.js and npm globals, output a versioned snapshot
+- ✅ `pitara scan` — discover Node.js, Go, Java, and Bun runtimes plus npm, pnpm,
+  and bun global packages; output a versioned snapshot
 - ✅ `pitara restore --from <file>` — restore from a local snapshot, with `--dry-run`
 - ✅ Plugin architecture with dependency-ordered restore and a clear ✓/⚠/✗ report
+- ✅ `pitara login` — GitHub device-flow auth (like `gh`)
+- ✅ `pitara backup` — commit a snapshot to a private `pitara-snapshots` repo in
+  your own account (auto-created on first use)
+- ✅ `pitara snapshots list` / `pitara restore` — list and restore your backups
 
 What's planned (see [Roadmap](#roadmap)):
 
-- More runtimes (Go, Java, Bun) and package managers (pnpm, bun)
-- Cloud backup/restore with login (`pitara login` / `backup` / `snapshots list`)
-- Cross-platform install strategies (macOS, Linux, Windows)
+- Cross-OS restore warnings and broader version-manager detection
+- Retry/recovery logic
 
 ---
 
@@ -82,6 +87,22 @@ pitara scan --label work-laptop  # tag the snapshot with a machine label
 pitara restore --from snapshot.json             # restore runtimes + globals
 pitara restore --from snapshot.json --dry-run   # show the plan, install nothing
 ```
+
+### Cloud
+
+Pitara stores backups in **your own GitHub** — a private `pitara-snapshots` repo
+it creates for you. No Pitara server or database is involved; the token lives only
+on your machine and talks directly to GitHub. See [Cloud](#cloud) for setup.
+
+```bash
+pitara login          # authorize via GitHub (device flow, like `gh`)
+pitara backup         # scan + commit this machine to your GitHub
+pitara snapshots list # see your saved machines
+pitara restore        # restore this machine's latest backup
+```
+
+Multiple machines? Add `--label <name>` to `backup`/`restore`. Most people with
+one machine never need it.
 
 Restore runs plugins in dependency order (e.g. Node before npm globals), skips
 anything with a failed prerequisite, and prints a summary report:
@@ -154,26 +175,51 @@ topologically sorts plugins by `Dependencies()` so prerequisites install first.
 ```text
 cmd/pitara/          CLI entrypoint
 internal/
-  cli/               Cobra commands (scan, restore)
+  cli/               Cobra commands (scan, restore, login, backup, ...)
   discovery/         Scan orchestrator
   restore/           Restore planner + executor
   snapshot/          Schema, validation, builder
   report/            Restore report formatter
-  plugins/           Plugin interface + registry
-    node/  npm/       MVP plugins
+  plugins/           Plugin interface + registry (node, go, java, bun, npm, ...)
+  auth/              Local session storage (~/.pitara)
+  github/            GitHub device-login + REST client (cloud storage)
   executil/          Command helpers
 ```
+
+The CLI depends only on Cobra; the GitHub client is pure standard library, so the
+installed binary stays small.
+
+---
+
+## Cloud
+
+Pitara's cloud backup is **GitHub-as-storage**: your snapshots live in a private
+`pitara-snapshots` repo in your own account. There is **no Pitara server or
+database** — the CLI talks directly to the GitHub API, and your token never leaves
+your machine (`~/.pitara`, `0600`).
+
+Just run `pitara login` and approve in your browser — no setup needed:
+
+```bash
+pitara login    # authorize via GitHub (device flow)
+pitara backup   # creates your private pitara-snapshots repo and commits a snapshot
+```
+
+Pitara requests the `repo` scope (needed to create the private repo and commit
+snapshots). Because the project is open source and runs no server, you can audit
+exactly what it does, and revoke access anytime at
+[github.com/settings/applications](https://github.com/settings/applications).
 
 ---
 
 ## Roadmap
 
-| Phase | Scope |
-|-------|-------|
-| 1 ✅ | CLI foundation: `scan`, local `restore`, Node + npm plugins |
-| 2     | Go, Java, Bun runtimes; pnpm + bun globals; per-OS install strategies |
-| 3     | Cloud: GitHub login, `backup`, `snapshots list`, versioned cloud restore |
-| 4     | Cross-OS warnings, version-manager detection, retry/recovery |
+| Phase | Scope | Status |
+|-------|-------|--------|
+| 1 | CLI foundation: `scan`, local `restore`, Node + npm plugins | ✅ |
+| 2 | Go, Java, Bun runtimes; pnpm + bun globals; per-OS install paths | ✅ |
+| 3 | Cloud: GitHub-backed `login`, `backup`, `snapshots list`, restore | ✅ |
+| 4 | Cross-OS warnings, version-manager detection, retry/recovery | ⏳ |
 
 ---
 

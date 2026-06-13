@@ -22,13 +22,21 @@ func FormatRestore(snap *snapshot.Snapshot, results []plugins.RestoreResult) str
 
 	warnings := 0
 	failures := 0
+	lastTitle := ""
 
 	for _, result := range results {
 		if result.Status == plugins.StatusSkipped && result.Message == "nothing to restore" {
 			continue
 		}
 
-		fmt.Fprintf(&b, "%s\n", titleFor(result.PluginName))
+		title := titleFor(result.PluginName)
+		if title != lastTitle {
+			if lastTitle != "" {
+				fmt.Fprintln(&b)
+			}
+			fmt.Fprintf(&b, "%s\n", title)
+			lastTitle = title
+		}
 		if len(result.Details) > 0 {
 			for _, line := range result.Details {
 				fmt.Fprintf(&b, "  %s\n", line)
@@ -37,7 +45,6 @@ func FormatRestore(snap *snapshot.Snapshot, results []plugins.RestoreResult) str
 			icon := iconFor(result.Status)
 			fmt.Fprintf(&b, "  %s %s\n", icon, result.Message)
 		}
-		fmt.Fprintln(&b)
 
 		if result.Status == plugins.StatusFailed {
 			failures++
@@ -47,6 +54,7 @@ func FormatRestore(snap *snapshot.Snapshot, results []plugins.RestoreResult) str
 		}
 	}
 
+	fmt.Fprintln(&b)
 	switch {
 	case failures > 0:
 		fmt.Fprintf(&b, "Restore completed with %d failure(s).\n", failures)
@@ -61,10 +69,14 @@ func FormatRestore(snap *snapshot.Snapshot, results []plugins.RestoreResult) str
 
 func titleFor(pluginName string) string {
 	switch pluginName {
-	case "node":
+	case "node", "go", "java", "bun":
 		return "Runtimes"
 	case "npm-globals":
 		return "Global Packages (npm)"
+	case "pnpm-globals":
+		return "Global Packages (pnpm)"
+	case "bun-globals":
+		return "Global Packages (bun)"
 	default:
 		return pluginName
 	}

@@ -2,49 +2,35 @@
 
 > GitHub backs up your code. **Pitara backs up your development environment.**
 
-Pitara is a CLI that scans a machine for language runtimes and globally installed
-CLI tools, captures them as a portable snapshot, and restores them on a new
-machine — so setting up a fresh laptop is closer to one command than one lost day.
+Set up a new laptop in minutes instead of a lost day. Pitara captures the language
+runtimes and global CLI tools on one machine and reinstalls them on another. It
+captures **Node, Go, Java, and Bun**, plus **npm, pnpm, and bun** global packages.
+
+> ### 🔒 You own it. We never see it.
+>
+> - **No server, no database** — backups live in *your own* GitHub repo
+> - **No secrets stored** — snapshots hold only tool names and versions
+> - **Your token never leaves your machine** (`~/.pitara`)
+> - **Open source** — audit every line yourself
 
 ```bash
-pitara scan -o snapshot.json   # capture this machine
-pitara restore --from snapshot.json   # rebuild it elsewhere
+pitara login     # one-time: sign in with GitHub
+pitara backup    # save this machine
+pitara restore   # rebuild it on a new machine
 ```
 
----
-
-## Status
-
-Pitara works today. Local backup/restore is fully offline; cloud backup uses
-**your own GitHub** — no Pitara server, no database.
-
-- ✅ `pitara scan` — discover Node.js, Go, Java, and Bun runtimes plus npm, pnpm,
-  and bun global packages; output a versioned snapshot
-- ✅ `pitara restore --from <file>` — restore from a local snapshot, with `--dry-run`
-- ✅ Plugin architecture with dependency-ordered restore and a clear ✓/⚠/✗ report
-- ✅ `pitara login` — GitHub device-flow auth (like `gh`)
-- ✅ `pitara backup` — commit a snapshot to a private `pitara-snapshots` repo in
-  your own account (auto-created on first use)
-- ✅ `pitara snapshots list` / `pitara restore` — list and restore your backups
-
-What's planned (see [Roadmap](#roadmap)):
-
-- Cross-OS restore warnings and broader version-manager detection
-- Retry/recovery logic
+That's the whole flow. Your backups land in a private `pitara-snapshots` repo
+Pitara creates in your account.
 
 ---
 
 ## Why
 
-Switching laptops, reinstalling an OS, or onboarding to a new machine means
-recreating a setup that's scattered across runtimes, package managers, and global
-CLIs. Existing tools each solve a slice — dotfiles for config, Settings Sync for
-editors, Brewfiles for Homebrew, Nix for full reproducibility (with a steep curve).
-Pitara aims for the simple middle: back up your **installation state** and restore
-it with one command.
-
-It intentionally does **not** handle secrets — no SSH keys, auth tokens, or env
-vars. Snapshots are safe to store and share.
+Switching laptops or reinstalling an OS means rebuilding a setup scattered across
+runtimes, package managers, and global CLIs. Existing tools each cover a slice —
+dotfiles for config, Settings Sync for editors, Brewfiles for Homebrew, Nix for
+full reproducibility (with a steep learning curve). Pitara takes the simple middle:
+back up your **installation state** and restore it with one command.
 
 ---
 
@@ -60,52 +46,42 @@ npm install -g pitara
 
 ```bash
 go install github.com/sailingsam/pitara/cmd/pitara@latest
-
-# or
-git clone https://github.com/sailingsam/pitara.git
-cd pitara && go build -o pitara ./cmd/pitara
 ```
 
-Prebuilt binaries for macOS, Linux, and Windows are attached to each
-[GitHub Release](https://github.com/sailingsam/pitara/releases).
+Prebuilt binaries for macOS, Linux, and Windows are attached to every
+[release](https://github.com/sailingsam/pitara/releases).
 
 ---
 
 ## Usage
 
-### Scan
+### Back up and restore
 
 ```bash
-pitara scan                      # print snapshot JSON to stdout
-pitara scan -o snapshot.json     # write to a file
-pitara scan --label work-laptop  # tag the snapshot with a machine label
+pitara login            # one-time: sign in with GitHub
+pitara backup           # save this machine
+pitara restore          # rebuild this setup on a new machine
+pitara snapshots list   # see your saved machines
 ```
 
-### Restore
+Backing up more than one machine? Add `--label <name>` to `backup` and `restore`
+(e.g. `--label work-laptop`). With a single machine you never need it.
+
+### Inspect a snapshot, or work offline
+
+`pitara scan` prints the snapshot Pitara *would* create — handy to see exactly
+what gets captured, or to save it as a file and move it yourself without an account:
 
 ```bash
-pitara restore --from snapshot.json             # restore runtimes + globals
-pitara restore --from snapshot.json --dry-run   # show the plan, install nothing
+pitara scan                          # print the snapshot (JSON) to the screen
+pitara scan -o snapshot.json         # save it to a file instead
+pitara restore --from snapshot.json  # restore from that file (add --dry-run to preview)
 ```
 
-### Cloud
+### The restore report
 
-Pitara stores backups in **your own GitHub** — a private `pitara-snapshots` repo
-it creates for you. No Pitara server or database is involved; the token lives only
-on your machine and talks directly to GitHub. See [Cloud](#cloud) for setup.
-
-```bash
-pitara login          # authorize via GitHub (device flow, like `gh`)
-pitara backup         # scan + commit this machine to your GitHub
-pitara snapshots list # see your saved machines
-pitara restore        # restore this machine's latest backup
-```
-
-Multiple machines? Add `--label <name>` to `backup`/`restore`. Most people with
-one machine never need it.
-
-Restore runs plugins in dependency order (e.g. Node before npm globals), skips
-anything with a failed prerequisite, and prints a summary report:
+Restore installs in dependency order (Node before npm globals, and so on), skips
+anything whose prerequisite failed, and prints a summary:
 
 ```text
 Pitara Restore Report
@@ -127,7 +103,9 @@ Restore completed.
 
 ## Snapshot format
 
-A snapshot is a small, versioned JSON document:
+A snapshot is a small, versioned JSON document. Each package manager's globals are
+kept in **separate lists** — Pitara never guesses which manager installed a tool,
+and on restore reinstalls each via its original manager.
 
 ```json
 {
@@ -148,16 +126,26 @@ A snapshot is a small, versioned JSON document:
 }
 ```
 
-Each package manager's globals are recorded in **separate lists** — Pitara never
-guesses which manager installed a tool. On restore, each is reinstalled via its
-original manager.
+---
+
+## How storage works
+
+Your snapshots live in a private `pitara-snapshots` repo in **your own** GitHub
+account (created on first backup). The CLI talks directly to the GitHub API — there
+is **no Pitara server and no database** — and your token stays on your machine
+(`~/.pitara`, `0600`). Every backup is a commit, so your history is just the git log.
+
+Login uses GitHub's device flow (like the `gh` CLI) and requests the `repo` scope,
+which is needed to create the private repo and commit snapshots. Because Pitara is
+open source and runs no server, you can audit exactly what it does — and revoke
+access anytime at [github.com/settings/applications](https://github.com/settings/applications).
 
 ---
 
 ## Architecture
 
-Pitara is built around a small **plugin** abstraction. Each tool category
-implements one interface for both directions:
+Pitara is built around a small **plugin** abstraction. Each tool category implements
+one interface for both directions:
 
 ```go
 type Plugin interface {
@@ -169,8 +157,8 @@ type Plugin interface {
 }
 ```
 
-Adding support for a new tool is: implement `Plugin`, register it. The registry
-topologically sorts plugins by `Dependencies()` so prerequisites install first.
+Adding a new tool is: implement `Plugin`, register it. The registry topologically
+sorts plugins by `Dependencies()` so prerequisites install first.
 
 ```text
 cmd/pitara/          CLI entrypoint
@@ -182,33 +170,12 @@ internal/
   report/            Restore report formatter
   plugins/           Plugin interface + registry (node, go, java, bun, npm, ...)
   auth/              Local session storage (~/.pitara)
-  github/            GitHub device-login + REST client (cloud storage)
+  github/            GitHub device-login + REST client
   executil/          Command helpers
 ```
 
 The CLI depends only on Cobra; the GitHub client is pure standard library, so the
 installed binary stays small.
-
----
-
-## Cloud
-
-Pitara's cloud backup is **GitHub-as-storage**: your snapshots live in a private
-`pitara-snapshots` repo in your own account. There is **no Pitara server or
-database** — the CLI talks directly to the GitHub API, and your token never leaves
-your machine (`~/.pitara`, `0600`).
-
-Just run `pitara login` and approve in your browser — no setup needed:
-
-```bash
-pitara login    # authorize via GitHub (device flow)
-pitara backup   # creates your private pitara-snapshots repo and commits a snapshot
-```
-
-Pitara requests the `repo` scope (needed to create the private repo and commit
-snapshots). Because the project is open source and runs no server, you can audit
-exactly what it does, and revoke access anytime at
-[github.com/settings/applications](https://github.com/settings/applications).
 
 ---
 
@@ -226,8 +193,8 @@ exactly what it does, and revoke access anytime at
 ## Contributing
 
 Contributions are welcome. Good first additions are new plugins — pick a tool,
-implement the `Plugin` interface, and register it. Please run `go build ./...`
-and `go test ./...` before opening a PR.
+implement the `Plugin` interface, and register it. Please run `go build ./...` and
+`go test ./...` before opening a PR.
 
 ---
 

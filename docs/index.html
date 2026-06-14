@@ -130,7 +130,12 @@
       color: #a6a6a6; font-size: clamp(1rem,1.6vw,1.15rem); line-height: 1.65; max-width: 540px;
       opacity: 0; transform: translateY(14px); transition: all .6s ease .3s;
     }
-    .install { opacity: 0; transition: opacity .5s ease .4s; }
+    .install { opacity: 0; transition: opacity .5s ease .4s; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+    .install-tabs { display: flex; gap: 6px; }
+    .install-tab { font-family: inherit; font-size: 12px; color: #777; padding: 4px 11px; border-radius: 6px; cursor: pointer; border: 1px solid transparent; background: none; transition: all .15s; }
+    .install-tab:hover { color: #ccc; }
+    .install-tab.active { color: #f0f0f0; background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.1); }
+    .install-alt { color: #777; font-size: 12.5px; transition: color .15s; }
     .install-box {
       display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px 8px 16px;
       background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.09); border-radius: 8px;
@@ -281,12 +286,18 @@
         <p class="sub">Set up a new laptop in minutes instead of a lost day. Pitara captures your language runtimes and global CLI tools and reinstalls them on a new machine.</p>
       </div>
       <div class="install">
+        <div class="install-tabs">
+          <button class="install-tab active" onclick="setInstall('unix', this)">macOS / Linux</button>
+          <button class="install-tab" onclick="setInstall('windows', this)">Windows</button>
+          <button class="install-tab" onclick="setInstall('npm', this)">npm</button>
+        </div>
         <div class="install-box">
-          <code id="install-cmd">npm install -g pitara</code>
+          <code id="install-cmd">curl -fsSL https://pitara.dev/install.sh | sh</code>
           <button class="copy-btn" id="copy-btn" aria-label="Copy" onclick="copyInstall()">
             <svg id="copy-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
           </button>
         </div>
+        <span class="install-alt" id="install-note">macOS & Linux — no Node.js needed, auto-detects your system</span>
       </div>
       <div class="ctas">
         <a class="btn btn-primary" href="https://github.com/sailingsam/pitara" target="_blank" rel="noopener">
@@ -419,6 +430,17 @@
     // copy button
     const checkSVG = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
     const copySVG = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>';
+    const INSTALL = {
+      npm:     { cmd: "npm install -g pitara", note: "Any OS — needs Node.js already installed" },
+      unix:    { cmd: "curl -fsSL https://pitara.dev/install.sh | sh", note: "macOS & Linux — no Node.js needed, auto-detects your system" },
+      windows: { cmd: "irm https://pitara.dev/install.ps1 | iex", note: "Windows PowerShell — no Node.js needed, auto-detects your system" },
+    };
+    function setInstall(key, btn) {
+      document.getElementById("install-cmd").textContent = INSTALL[key].cmd;
+      document.getElementById("install-note").textContent = INSTALL[key].note;
+      document.querySelectorAll(".install-tab").forEach(t => t.classList.remove("active"));
+      btn.classList.add("active");
+    }
     function copyInstall() {
       const btn = document.getElementById("copy-btn");
       navigator.clipboard.writeText(document.getElementById("install-cmd").textContent).then(() => {

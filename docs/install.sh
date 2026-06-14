@@ -54,3 +54,4 @@ case ":$PATH:" in
 esac
 
 echo "Done! Run:  pitara --help"
+echo "(If your shell says 'No such file or directory', run 'hash -r' or open a new terminal.)"

@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Read the contributing guide
+    url: https://github.com/sailingsam/pitara/blob/main/CONTRIBUTING.md
+    about: How to add a tool, run the build, and open a PR.
+  - name: Question or idea
+    url: https://github.com/sailingsam/pitara/discussions
+    about: Not a bug? Start a discussion.

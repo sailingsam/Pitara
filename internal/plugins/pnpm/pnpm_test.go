@@ -1,6 +1,7 @@
 package pnpm
 
 import (
+	"sort"
 	"testing"
 
 	"github.com/sailingsam/pitara/internal/snapshot"
@@ -112,12 +113,17 @@ func TestParsePNPMList(t *testing.T) {
 				t.Fatalf("got %d packages, wanted %d", len(got), len(tt.want))
 			}
 
+			// parsePNPMList ranges over a map, so output order is not
+			// deterministic — sort both sides by name before comparing.
+			sort.Slice(got, func(i, j int) bool { return got[i].Name < got[j].Name })
+			sort.Slice(tt.want, func(i, j int) bool { return tt.want[i].Name < tt.want[j].Name })
+
 			for i := range got {
 				if got[i].Name != tt.want[i].Name {
 					t.Errorf("got %s as package name, wanted %s", got[i].Name, tt.want[i].Name)
 				}
 				if got[i].Version != tt.want[i].Version {
-					t.Errorf("got %s as package name, wanted %s", got[i].Version, tt.want[i].Version)
+					t.Errorf("got %s as version, wanted %s", got[i].Version, tt.want[i].Version)
 				}
 			}
 		})

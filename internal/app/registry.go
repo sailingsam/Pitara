@@ -9,6 +9,7 @@ import (
 	"github.com/sailingsam/pitara/internal/plugins/node"
 	"github.com/sailingsam/pitara/internal/plugins/npm"
 	"github.com/sailingsam/pitara/internal/plugins/pnpm"
+	"github.com/sailingsam/pitara/internal/plugins/python"
 )
 
 func DefaultRegistry() *plugins.Registry {
@@ -20,5 +21,6 @@ func DefaultRegistry() *plugins.Registry {
 		npm.New(),
 		pnpm.New(),
 		bunglobals.New(),
+		python.New(),
 	)
 }

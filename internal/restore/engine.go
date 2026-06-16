@@ -114,6 +114,10 @@ func pluginPayload(name string, fullSnap []byte) (json.RawMessage, error) {
 		return json.Marshal(struct {
 			Bun *snapshot.Runtime `json:"bun"`
 		}{Bun: snap.Languages.Bun})
+	case "deno":
+		return json.Marshal(struct {
+			Deno *snapshot.Runtime `json:"deno"`
+		}{Deno: snap.Languages.Deno})
 	case "npm-globals":
 		return json.Marshal(struct {
 			NPM *snapshot.GlobalPackages `json:"npm"`
@@ -126,6 +130,10 @@ func pluginPayload(name string, fullSnap []byte) (json.RawMessage, error) {
 		return json.Marshal(struct {
 			Bun *snapshot.GlobalPackages `json:"bun"`
 		}{Bun: snap.Packages.Bun})
+	case "deno-globals":
+		return json.Marshal(struct {
+			Deno *snapshot.DenoGlobals `json:"deno"`
+		}{Deno: snap.Packages.Deno})
 	default:
 		return nil, fmt.Errorf("unknown plugin %q", name)
 	}
@@ -157,6 +165,12 @@ func hasRestoreData(name string, payload json.RawMessage) bool {
 		}
 		_ = json.Unmarshal(payload, &data)
 		return data.Bun != nil && data.Bun.Version != ""
+	case "deno":
+		var data struct {
+			Deno *snapshot.Runtime `json:"deno"`
+		}
+		_ = json.Unmarshal(payload, &data)
+		return data.Deno != nil && data.Deno.Version != ""
 	case "npm-globals":
 		var data struct {
 			NPM *snapshot.GlobalPackages `json:"npm"`
@@ -175,6 +189,12 @@ func hasRestoreData(name string, payload json.RawMessage) bool {
 		}
 		_ = json.Unmarshal(payload, &data)
 		return data.Bun != nil && len(data.Bun.Globals) > 0
+	case "deno-globals":
+		var data struct {
+			Deno *snapshot.DenoGlobals `json:"deno"`
+		}
+		_ = json.Unmarshal(payload, &data)
+		return data.Deno != nil && len(data.Deno.Globals) > 0
 	default:
 		return false
 	}

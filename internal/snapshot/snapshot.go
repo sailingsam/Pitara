@@ -9,12 +9,12 @@ import (
 const CurrentSchemaVersion = 1
 
 type Snapshot struct {
-	SchemaVersion int               `json:"schemaVersion"`
-	ID            string            `json:"id,omitempty"`
-	CreatedAt     time.Time         `json:"createdAt"`
-	Machine       Machine           `json:"machine"`
-	Languages     Languages         `json:"languages"`
-	Packages      Packages          `json:"packages"`
+	SchemaVersion int       `json:"schemaVersion"`
+	ID            string    `json:"id,omitempty"`
+	CreatedAt     time.Time `json:"createdAt"`
+	Machine       Machine   `json:"machine"`
+	Languages     Languages `json:"languages"`
+	Packages      Packages  `json:"packages"`
 }
 
 type Machine struct {
@@ -28,6 +28,7 @@ type Languages struct {
 	Go   *Runtime `json:"go,omitempty"`
 	Java *Java    `json:"java,omitempty"`
 	Bun  *Runtime `json:"bun,omitempty"`
+	Deno *Runtime `json:"deno,omitempty"`
 }
 
 type Runtime struct {
@@ -44,6 +45,7 @@ type Packages struct {
 	NPM  *GlobalPackages `json:"npm,omitempty"`
 	PNPM *GlobalPackages `json:"pnpm,omitempty"`
 	Bun  *GlobalPackages `json:"bun,omitempty"`
+	Deno *DenoGlobals    `json:"deno,omitempty"`
 }
 
 type GlobalPackages struct {
@@ -53,6 +55,19 @@ type GlobalPackages struct {
 type GlobalPackage struct {
 	Name    string `json:"name"`
 	Version string `json:"version,omitempty"`
+}
+
+// DenoGlobals holds CLIs installed with `deno install -g`. Unlike npm/bun
+// globals, a Deno global isn't a versioned package name — it's a module
+// specifier plus the permission flags it was granted, so it needs its own type.
+type DenoGlobals struct {
+	Globals []DenoGlobal `json:"globals"`
+}
+
+type DenoGlobal struct {
+	Name      string   `json:"name"`
+	Specifier string   `json:"specifier"`
+	Flags     []string `json:"flags,omitempty"`
 }
 
 func New(label, os, arch string) *Snapshot {

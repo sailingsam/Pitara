@@ -18,14 +18,30 @@ type Plugin interface {
 }
 ```
 
-To add a tool (say, Python or Rust):
+To add a tool (say, Python or Rust), you touch a few small spots. Copy an
+existing plugin of the same kind — a **runtime** like `internal/plugins/golang`,
+or a **global-package manager** like `internal/plugins/npm`.
 
-1. Create `internal/plugins/<tool>/<tool>.go` implementing `Plugin`.
-2. Register it in `internal/app/registry.go`.
-3. Add a small test that parses real `--version` output (see existing plugins).
+1. **Create the plugin** `internal/plugins/<tool>/<tool>.go` implementing `Plugin`.
+2. **Add a parser test** `<tool>_test.go` that parses real command output (e.g.
+   `--version`, or `list` output). If your parser ranges over a map, sort before
+   comparing — Go map order is randomized and will make the test flaky otherwise.
+3. **Register it** in `internal/app/registry.go`.
+4. **Add a snapshot field** in `internal/snapshot/snapshot.go` — to `Languages`
+   for a runtime, or `Packages` for a global-package manager.
+5. **Store the scan** in `internal/snapshot/builder.go` — add a `case "<name>"`
+   in `applyScanResult` that writes your data into the snapshot field.
+6. **Wire up restore** in `internal/restore/engine.go` — add a `case "<name>"`
+   in **both** `pluginPayload` and `hasRestoreData`.
+7. **Add a report label** in `internal/report/report.go` (`titleFor`).
+
+> Steps 4–7 are easy to miss: skip them and the plugin compiles, but
+> `pitara scan` fails with `unknown plugin "<name>"`. Run `go run ./cmd/pitara scan`
+> to confirm your tool shows up.
 
 The registry topologically sorts plugins by `Dependencies()`, so prerequisites
-(e.g. Node before npm globals) always install first.
+(e.g. Node before npm globals) always install first. A global-package plugin
+should depend on its runtime — e.g. `Dependencies() []string { return []string{"node"} }`.
 
 ## Before opening a PR
 

@@ -26,7 +26,8 @@ func (p *Plugin) SupportedOS() []plugins.OS {
 }
 
 // `java -version` writes its banner to stderr, e.g.:
-//   openjdk version "17.0.19" 2026-04-21
+//
+//	openjdk version "17.0.19" 2026-04-21
 var versionRe = regexp.MustCompile(`version "([^"]+)"`)
 
 func (p *Plugin) Scan(ctx context.Context) (plugins.ScanResult, error) {

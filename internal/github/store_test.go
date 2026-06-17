@@ -4,10 +4,10 @@ import "testing"
 
 func TestFileFor(t *testing.T) {
 	cases := map[string]string{
-		"":             "default.json", // no label → default
-		"default":      "default.json",
-		"work-laptop":  "work-laptop.json",
-		"office-pc":    "office-pc.json",
+		"":            "default.json", // no label → default
+		"default":     "default.json",
+		"work-laptop": "work-laptop.json",
+		"office-pc":   "office-pc.json",
 	}
 	for label, want := range cases {
 		if got := fileFor(label); got != want {

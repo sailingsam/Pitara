@@ -19,7 +19,7 @@ func (s stubPlugin) Restore(ctx context.Context, snap json.RawMessage, opts Rest
 	return RestoreResult{PluginName: s.name, Status: StatusSuccess}, nil
 }
 func (s stubPlugin) Dependencies() []string { return s.deps }
-func (s stubPlugin) SupportedOS() []OS       { return []OS{OSLinux} }
+func (s stubPlugin) SupportedOS() []OS      { return []OS{OSLinux} }
 
 func TestRestoreOrder(t *testing.T) {
 	r := NewRegistry(

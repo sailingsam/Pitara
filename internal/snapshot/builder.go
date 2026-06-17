@@ -59,6 +59,14 @@ func applyScanResult(snap *Snapshot, result plugins.ScanResult) error {
 			return err
 		}
 		snap.Languages.Bun = data.Bun
+	case "deno":
+		var data struct {
+			Deno *Runtime `json:"deno"`
+		}
+		if err := json.Unmarshal(result.Data, &data); err != nil {
+			return err
+		}
+		snap.Languages.Deno = data.Deno
 	case "npm-globals":
 		var data struct {
 			NPM *GlobalPackages `json:"npm"`
@@ -83,6 +91,14 @@ func applyScanResult(snap *Snapshot, result plugins.ScanResult) error {
 			return err
 		}
 		snap.Packages.Bun = data.Bun
+	case "deno-globals":
+		var data struct {
+			Deno *DenoGlobals `json:"deno"`
+		}
+		if err := json.Unmarshal(result.Data, &data); err != nil {
+			return err
+		}
+		snap.Packages.Deno = data.Deno
 	default:
 		return fmt.Errorf("unknown plugin %q", result.PluginName)
 	}

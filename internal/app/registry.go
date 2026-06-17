@@ -4,6 +4,8 @@ import (
 	"github.com/sailingsam/pitara/internal/plugins"
 	"github.com/sailingsam/pitara/internal/plugins/bun"
 	"github.com/sailingsam/pitara/internal/plugins/bunglobals"
+	"github.com/sailingsam/pitara/internal/plugins/deno"
+	"github.com/sailingsam/pitara/internal/plugins/denoglobals"
 	"github.com/sailingsam/pitara/internal/plugins/golang"
 	"github.com/sailingsam/pitara/internal/plugins/java"
 	"github.com/sailingsam/pitara/internal/plugins/node"
@@ -18,9 +20,11 @@ func DefaultRegistry() *plugins.Registry {
 		golang.New(),
 		java.New(),
 		bun.New(),
+		deno.New(),
 		npm.New(),
 		pnpm.New(),
 		bunglobals.New(),
+		denoglobals.New(),
 		python.New(),
 	)
 }

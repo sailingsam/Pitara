@@ -106,6 +106,12 @@ func pluginPayload(name string, fullSnap []byte) (json.RawMessage, error) {
 		return json.Marshal(struct {
 			Go *snapshot.Runtime `json:"go"`
 		}{Go: snap.Languages.Go})
+	case "python":
+		return json.Marshal(struct {
+			Python *snapshot.Runtime `json:"python"`
+		}{
+			Python: snap.Languages.Python,
+		})
 	case "java":
 		return json.Marshal(struct {
 			Java *snapshot.Java `json:"java"`
@@ -153,6 +159,14 @@ func hasRestoreData(name string, payload json.RawMessage) bool {
 		}
 		_ = json.Unmarshal(payload, &data)
 		return data.Go != nil && data.Go.Version != ""
+	case "python":
+		var data struct {
+			Python *snapshot.Runtime `json:"python"`
+		}
+
+		_ = json.Unmarshal(payload, &data)
+
+		return data.Python != nil && data.Python.Version != ""
 	case "java":
 		var data struct {
 			Java *snapshot.Java `json:"java"`

@@ -69,7 +69,7 @@ func FormatRestore(snap *snapshot.Snapshot, results []plugins.RestoreResult) str
 
 func titleFor(pluginName string) string {
 	switch pluginName {
-	case "node", "go", "java", "bun", "deno":
+	case "node", "go", "java", "bun", "deno", "python":
 		return "Runtimes"
 	case "npm-globals":
 		return "Global Packages (npm)"

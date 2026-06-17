@@ -43,6 +43,16 @@ func applyScanResult(snap *Snapshot, result plugins.ScanResult) error {
 			return err
 		}
 		snap.Languages.Go = data.Go
+	case "python":
+		var data struct {
+			Python *Runtime `json:"python"`
+		}
+
+		if err := json.Unmarshal(result.Data, &data); err != nil {
+			return err
+		}
+
+		snap.Languages.Python = data.Python
 	case "java":
 		var data struct {
 			Java *Java `json:"java"`

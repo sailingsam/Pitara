@@ -24,11 +24,12 @@ type Machine struct {
 }
 
 type Languages struct {
-	Node *Runtime `json:"node,omitempty"`
-	Go   *Runtime `json:"go,omitempty"`
-	Java *Java    `json:"java,omitempty"`
-	Bun  *Runtime `json:"bun,omitempty"`
-	Deno *Runtime `json:"deno,omitempty"`
+	Node   *Runtime `json:"node,omitempty"`
+	Go     *Runtime `json:"go,omitempty"`
+	Java   *Java    `json:"java,omitempty"`
+	Bun    *Runtime `json:"bun,omitempty"`
+	Deno   *Runtime `json:"deno,omitempty"`
+	Python *Runtime `json:"python,omitempty"`
 }
 
 type Runtime struct {

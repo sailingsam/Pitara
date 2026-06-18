@@ -233,7 +233,7 @@ func installPython(
 				"winget",
 				"install",
 				"--id",
-				"Python.Python."+strings.ReplaceAll(majorMinor(version), ".", ""),
+				"Python.Python."+majorMinor(version),
 				"-e",
 			); err == nil {
 				return nil

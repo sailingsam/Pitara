@@ -4,11 +4,17 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// version is the build version, overridden at release time via ldflags:
+//
+//	-X github.com/sailingsam/pitara/internal/cli.version=<tag>
+var version = "dev"
+
 func NewRoot() *cobra.Command {
 	root := &cobra.Command{
-		Use:   "pitara",
-		Short: "Backup and restore your development environment",
-		Long:  "Pitara scans your machine for language runtimes and global CLI tools, then restores them on a new machine.",
+		Use:     "pitara",
+		Short:   "Backup and restore your development environment",
+		Long:    "Pitara scans your machine for language runtimes and global CLI tools, then restores them on a new machine.",
+		Version: version,
 	}
 
 	root.AddCommand(newScanCmd())

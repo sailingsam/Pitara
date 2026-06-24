@@ -24,6 +24,7 @@ builds:
       - arm64
     ldflags:
       - -s -w
+      - -X github.com/sailingsam/pitara/internal/cli.version={{.Version}}
 
 # Publish raw binaries (not tar.gz) so the npm installer can download one file directly.
 # Produces assets named: pitara_linux_amd64, pitara_darwin_arm64, pitara_windows_amd64.exe, ...

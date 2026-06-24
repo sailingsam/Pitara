@@ -30,6 +30,7 @@ type Languages struct {
 	Bun    *Runtime `json:"bun,omitempty"`
 	Deno   *Runtime `json:"deno,omitempty"`
 	Python *Runtime `json:"python,omitempty"`
+	Rust   *Runtime `json:"rust,omitempty"`
 }
 
 type Runtime struct {
@@ -43,10 +44,12 @@ type Java struct {
 }
 
 type Packages struct {
-	NPM  *GlobalPackages `json:"npm,omitempty"`
-	PNPM *GlobalPackages `json:"pnpm,omitempty"`
-	Bun  *GlobalPackages `json:"bun,omitempty"`
-	Deno *DenoGlobals    `json:"deno,omitempty"`
+	NPM   *GlobalPackages `json:"npm,omitempty"`
+	PNPM  *GlobalPackages `json:"pnpm,omitempty"`
+	Bun   *GlobalPackages `json:"bun,omitempty"`
+	Deno  *DenoGlobals    `json:"deno,omitempty"`
+	Yarn  *GlobalPackages `json:"yarn,omitempty"`
+	Cargo *GlobalPackages `json:"cargo,omitempty"`
 }
 
 type GlobalPackages struct {

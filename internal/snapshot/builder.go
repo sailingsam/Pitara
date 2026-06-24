@@ -77,6 +77,14 @@ func applyScanResult(snap *Snapshot, result plugins.ScanResult) error {
 			return err
 		}
 		snap.Languages.Deno = data.Deno
+	case "rust":
+		var data struct {
+			Rust *Runtime `json:"rust"`
+		}
+		if err := json.Unmarshal(result.Data, &data); err != nil {
+			return err
+		}
+		snap.Languages.Rust = data.Rust
 	case "npm-globals":
 		var data struct {
 			NPM *GlobalPackages `json:"npm"`
@@ -109,6 +117,22 @@ func applyScanResult(snap *Snapshot, result plugins.ScanResult) error {
 			return err
 		}
 		snap.Packages.Deno = data.Deno
+	case "yarn-globals":
+		var data struct {
+			Yarn *GlobalPackages `json:"yarn"`
+		}
+		if err := json.Unmarshal(result.Data, &data); err != nil {
+			return err
+		}
+		snap.Packages.Yarn = data.Yarn
+	case "cargo-globals":
+		var data struct {
+			Cargo *GlobalPackages `json:"cargo"`
+		}
+		if err := json.Unmarshal(result.Data, &data); err != nil {
+			return err
+		}
+		snap.Packages.Cargo = data.Cargo
 	default:
 		return fmt.Errorf("unknown plugin %q", result.PluginName)
 	}

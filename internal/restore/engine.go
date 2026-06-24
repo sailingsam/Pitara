@@ -124,6 +124,10 @@ func pluginPayload(name string, fullSnap []byte) (json.RawMessage, error) {
 		return json.Marshal(struct {
 			Deno *snapshot.Runtime `json:"deno"`
 		}{Deno: snap.Languages.Deno})
+	case "rust":
+		return json.Marshal(struct {
+			Rust *snapshot.Runtime `json:"rust"`
+		}{Rust: snap.Languages.Rust})
 	case "npm-globals":
 		return json.Marshal(struct {
 			NPM *snapshot.GlobalPackages `json:"npm"`
@@ -140,6 +144,14 @@ func pluginPayload(name string, fullSnap []byte) (json.RawMessage, error) {
 		return json.Marshal(struct {
 			Deno *snapshot.DenoGlobals `json:"deno"`
 		}{Deno: snap.Packages.Deno})
+	case "yarn-globals":
+		return json.Marshal(struct {
+			Yarn *snapshot.GlobalPackages `json:"yarn"`
+		}{Yarn: snap.Packages.Yarn})
+	case "cargo-globals":
+		return json.Marshal(struct {
+			Cargo *snapshot.GlobalPackages `json:"cargo"`
+		}{Cargo: snap.Packages.Cargo})
 	default:
 		return nil, fmt.Errorf("unknown plugin %q", name)
 	}
@@ -185,6 +197,12 @@ func hasRestoreData(name string, payload json.RawMessage) bool {
 		}
 		_ = json.Unmarshal(payload, &data)
 		return data.Deno != nil && data.Deno.Version != ""
+	case "rust":
+		var data struct {
+			Rust *snapshot.Runtime `json:"rust"`
+		}
+		_ = json.Unmarshal(payload, &data)
+		return data.Rust != nil && data.Rust.Version != ""
 	case "npm-globals":
 		var data struct {
 			NPM *snapshot.GlobalPackages `json:"npm"`
@@ -209,6 +227,18 @@ func hasRestoreData(name string, payload json.RawMessage) bool {
 		}
 		_ = json.Unmarshal(payload, &data)
 		return data.Deno != nil && len(data.Deno.Globals) > 0
+	case "yarn-globals":
+		var data struct {
+			Yarn *snapshot.GlobalPackages `json:"yarn"`
+		}
+		_ = json.Unmarshal(payload, &data)
+		return data.Yarn != nil && len(data.Yarn.Globals) > 0
+	case "cargo-globals":
+		var data struct {
+			Cargo *snapshot.GlobalPackages `json:"cargo"`
+		}
+		_ = json.Unmarshal(payload, &data)
+		return data.Cargo != nil && len(data.Cargo.Globals) > 0
 	default:
 		return false
 	}

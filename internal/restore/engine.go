@@ -152,6 +152,10 @@ func pluginPayload(name string, fullSnap []byte) (json.RawMessage, error) {
 		return json.Marshal(struct {
 			Cargo *snapshot.GlobalPackages `json:"cargo"`
 		}{Cargo: snap.Packages.Cargo})
+	case "pipx-globals":
+		return json.Marshal(struct {
+			Pipx *snapshot.GlobalPackages `json:"pipx"`
+		}{Pipx: snap.Packages.Pipx})
 	default:
 		return nil, fmt.Errorf("unknown plugin %q", name)
 	}
@@ -239,6 +243,12 @@ func hasRestoreData(name string, payload json.RawMessage) bool {
 		}
 		_ = json.Unmarshal(payload, &data)
 		return data.Cargo != nil && len(data.Cargo.Globals) > 0
+	case "pipx-globals":
+		var data struct {
+			Pipx *snapshot.GlobalPackages `json:"pipx"`
+		}
+		_ = json.Unmarshal(payload, &data)
+		return data.Pipx != nil && len(data.Pipx.Globals) > 0
 	default:
 		return false
 	}

@@ -50,6 +50,7 @@ type Packages struct {
 	Deno  *DenoGlobals    `json:"deno,omitempty"`
 	Yarn  *GlobalPackages `json:"yarn,omitempty"`
 	Cargo *GlobalPackages `json:"cargo,omitempty"`
+	Pipx  *GlobalPackages `json:"pipx,omitempty"`
 }
 
 type GlobalPackages struct {

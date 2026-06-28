@@ -133,6 +133,14 @@ func applyScanResult(snap *Snapshot, result plugins.ScanResult) error {
 			return err
 		}
 		snap.Packages.Cargo = data.Cargo
+	case "pipx-globals":
+		var data struct {
+			Pipx *GlobalPackages `json:"pipx"`
+		}
+		if err := json.Unmarshal(result.Data, &data); err != nil {
+			return err
+		}
+		snap.Packages.Pipx = data.Pipx
 	default:
 		return fmt.Errorf("unknown plugin %q", result.PluginName)
 	}

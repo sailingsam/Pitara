@@ -11,6 +11,7 @@ import (
 	"github.com/sailingsam/pitara/internal/plugins/java"
 	"github.com/sailingsam/pitara/internal/plugins/node"
 	"github.com/sailingsam/pitara/internal/plugins/npm"
+	"github.com/sailingsam/pitara/internal/plugins/pipx"
 	"github.com/sailingsam/pitara/internal/plugins/pnpm"
 	"github.com/sailingsam/pitara/internal/plugins/python"
 	"github.com/sailingsam/pitara/internal/plugins/rust"
@@ -32,5 +33,6 @@ func DefaultRegistry() *plugins.Registry {
 		denoglobals.New(),
 		yarn.New(),
 		cargoglobals.New(),
+		pipx.New(),
 	)
 }

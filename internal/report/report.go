@@ -83,6 +83,8 @@ func titleFor(pluginName string) string {
 		return "Global Packages (yarn)"
 	case "cargo-globals":
 		return "Global Packages (cargo)"
+	case "pipx-globals":
+		return "Global Packages (pipx)"
 	default:
 		return pluginName
 	}

@@ -4,7 +4,8 @@
 
 Set up a new laptop in minutes instead of a lost day. Pitara captures the language
 runtimes and global CLI tools on one machine and reinstalls them on another. It
-captures **Node, Go, Java, and Bun**, plus **npm, pnpm, and bun** global packages.
+captures **Node, Go, Java, Bun, Deno, Python, and Rust** runtimes, plus global
+packages from **npm, pnpm, Yarn, Bun, Deno, pipx, and Cargo**.
 
 > ### 🔒 You own it. We never see it.
 >
@@ -31,6 +32,15 @@ runtimes, package managers, and global CLIs. Existing tools each cover a slice �
 dotfiles for config, Settings Sync for editors, Brewfiles for Homebrew, Nix for
 full reproducibility (with a steep learning curve). Pitara takes the simple middle:
 back up your **installation state** and restore it with one command.
+
+### Why not just `brew bundle`?
+
+`brew bundle` is great — if your whole world is Homebrew on a Mac. But a real dev
+environment is spread across many package managers: npm, pnpm, Yarn, Bun, pipx,
+Cargo, plus version managers like nvm, pyenv, and rustup. `brew bundle` only knows
+about Homebrew formulae. Pitara captures **all** of them and restores each tool
+through the *same* manager that installed it (an npm global comes back via npm, a
+pipx tool via pipx), on any OS, synced through your own GitHub repo.
 
 ---
 
@@ -62,6 +72,7 @@ pitara login            # one-time: sign in with GitHub
 pitara backup           # save this machine
 pitara restore          # rebuild this setup on a new machine
 pitara snapshots list   # see your saved machines
+pitara --version        # print the installed Pitara version
 ```
 
 Backing up more than one machine? Add `--label <name>` to `backup` and `restore`
@@ -168,7 +179,8 @@ internal/
   restore/           Restore planner + executor
   snapshot/          Schema, validation, builder
   report/            Restore report formatter
-  plugins/           Plugin interface + registry (node, go, java, bun, npm, ...)
+  plugins/           Plugin interface + registry (node, go, java, bun, deno,
+                     python, rust, npm, pnpm, yarn, bun/deno/pipx/cargo globals)
   auth/              Local session storage (~/.pitara)
   github/            GitHub device-login + REST client
   executil/          Command helpers
@@ -184,7 +196,7 @@ installed binary stays small.
 | Phase | Scope | Status |
 |-------|-------|--------|
 | 1 | CLI foundation: `scan`, local `restore`, Node + npm plugins | ✅ |
-| 2 | Go, Java, Bun runtimes; pnpm + bun globals; per-OS install paths | ✅ |
+| 2 | Go, Java, Bun, Deno, Python, Rust runtimes; pnpm/yarn/bun/deno/pipx/cargo globals; per-OS install paths | ✅ |
 | 3 | Cloud: GitHub-backed `login`, `backup`, `snapshots list`, restore | ✅ |
 | 4 | Cross-OS warnings, version-manager detection, retry/recovery | ⏳ |
 

@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 	"strings"
 
 	"github.com/sailingsam/pitara/internal/executil"
@@ -120,6 +121,15 @@ func installNode(ctx context.Context, version string) error {
 	if executil.Available("fnm") {
 		if _, err := executil.Run(ctx, "fnm", "install", version); err == nil {
 			_, err = executil.Run(ctx, "fnm", "use", version)
+			return err
+		}
+	}
+
+	// nvm-windows is a separate, native tool (not the Unix nvm.sh bash script):
+	// it's driven directly as `nvm install <v>` / `nvm use <v>`.
+	if runtime.GOOS == "windows" && executil.Available("nvm") {
+		if _, err := executil.Run(ctx, "nvm", "install", version); err == nil {
+			_, err = executil.Run(ctx, "nvm", "use", version)
 			return err
 		}
 	}
